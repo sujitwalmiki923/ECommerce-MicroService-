@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/docs/" />
+  <Folder Name="/shared/" />
+  <Folder Name="/src/">
+    <Project Path="IdentityService/IdentityService.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
