@@ -24,5 +24,14 @@ namespace IdentityService.Controllers
 
             return Ok(result);
         }
+
+        //Login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(DTOs.LoginRequest request)
+        {
+            var result = await _authService.LoginAsync(request);
+
+            return Ok(result);
+        }
     }
 }

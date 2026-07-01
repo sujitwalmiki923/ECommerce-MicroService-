@@ -6,5 +6,8 @@ namespace IdentityService.Interfaces
     public interface IAuthService
     {
         Task<RegisterResponse> RegisterAsync(RegisterRequests request);
+
+        Task<LoginResponse> LoginAsync(DTOs.LoginRequest request);
     }
 }
+
