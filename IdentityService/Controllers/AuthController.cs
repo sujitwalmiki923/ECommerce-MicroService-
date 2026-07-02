@@ -1,4 +1,5 @@
-﻿using IdentityService.DTOs;
+﻿using IdentityService.Common;
+using IdentityService.DTOs;
 using IdentityService.Interfaces;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,15 @@ namespace IdentityService.Controllers
         {
             var result = await _authService.RegisterAsync(request);
 
-            return Ok(result);
+            // return Ok(result);
+
+            //Production ready Generic Response
+
+            return Ok(
+                ApiResponse<RegisterResponse>.SuccessResponse(
+                  result,
+                  "Registration  Successful")
+                );
         }
 
         //Login
@@ -31,7 +40,13 @@ namespace IdentityService.Controllers
         {
             var result = await _authService.LoginAsync(request);
 
-            return Ok(result);
+            //return Ok(result);
+
+            return Ok(
+                ApiResponse<LoginResponse>.SuccessResponse(
+                    result,
+                    "Login Successful"
+                    ));
         }
     }
 }
