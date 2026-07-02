@@ -11,20 +11,24 @@ namespace IdentityService.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordService _passwordService;
         private readonly IJwtService _jwtService;
-        public AuthService(IUserRepository userRepository , IPasswordService passwordService , IJwtService jwtService )
+        private readonly ILogger<AuthService> _logger;
+        public AuthService(IUserRepository userRepository , IPasswordService passwordService , IJwtService jwtService ,ILogger<AuthService> logger )
         {
              _userRepository = userRepository; 
             _passwordService = passwordService;
             _jwtService = jwtService;
+            _logger = logger;
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
+            _logger.LogInformation("Login attempt for {Email}", request.Email);
             //Step 1: Find USer
             var user = await _userRepository.GetEbyEmailAsync(request.Email);
 
             if(user == null) 
             {
+                _logger.LogWarning("Login failed. User {Email} not found.",request.Email);
                 throw new UnauthorizedException("Invalid Email or Password");
             }
 
@@ -33,12 +37,16 @@ namespace IdentityService.Services
 
             if (!isPasswordValid) 
             {
+                _logger.LogWarning( "Invalid password for {Email}",request.Email);
+
+                throw new UnauthorizedException("Invalid email or password.");
                 throw new UnauthorizedException("Invalid email or password");
             }
 
             //Step 3: Generate JWT Token
             var token = _jwtService.GenerateToken(user);
 
+            _logger.LogInformation( "User {UserId} logged in successfully.", user.Id);
             return new LoginResponse 
             {
                 Token = token,
@@ -50,12 +58,16 @@ namespace IdentityService.Services
 
         public async Task<RegisterResponse> RegisterAsync(RegisterRequests request)
         {
+            _logger.LogInformation("Register request received for {Email} ", request.Email);
+
             var existingUser = await _userRepository.GetEbyEmailAsync(request.Email);
 
             if(existingUser != null)
             {
-               // throw new Exception("Email already exists");
-               throw new ConflictException("Email already exists");
+                _logger.LogWarning("Registration failed. Email {Email} already exists.", request.Email);
+
+                // throw new Exception("Email already exists");
+                throw new ConflictException("Email already exists");
             }
         
 
@@ -77,11 +89,17 @@ namespace IdentityService.Services
 
             await _userRepository.SaveChangesAsync();
 
+            _logger.LogInformation(
+    "User {UserId} registered successfully.",
+    user.Id);
+
             return new RegisterResponse 
             {
                 UserId = user.Id,
                 Message = "User registered successfully"
             };
+
+
         }
     }
 }
