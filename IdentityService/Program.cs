@@ -1,14 +1,16 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using IdentityService.Configurations;
 using IdentityService.Data;
 using IdentityService.Interfaces;
+using IdentityService.Middleware;
 using IdentityService.Repositories;
 using IdentityService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
 using Microsoft.OpenApi.Models;
-using IdentityService.Middleware;
+using System.Text;
 
 namespace IdentityService
 {
@@ -40,6 +42,7 @@ namespace IdentityService
             //JWT Service For Generating Token
             builder.Services.AddScoped<IJwtService, JwtService>();
 
+           
             //Get All Jwt Section 
             var jwtsettings = builder.Configuration
                 .GetSection("Jwt")
@@ -72,6 +75,10 @@ namespace IdentityService
             });
 
             builder.Services.AddControllers();
+
+            builder.Services.AddFluentValidationAutoValidation();
+
+            builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
