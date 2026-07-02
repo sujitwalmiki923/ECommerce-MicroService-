@@ -7,9 +7,11 @@ namespace IdentityService.Middleware
     public class GlobalExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        public GlobalExceptionMiddleware(RequestDelegate request)
+        ILogger<GlobalExceptionMiddleware> _logger;
+        public GlobalExceptionMiddleware(RequestDelegate request , ILogger<GlobalExceptionMiddleware> logger)
         {
-            _next = request;   
+            _next = request; 
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -20,6 +22,7 @@ namespace IdentityService.Middleware
             }
             catch(Exception ex)
             {
+                _logger.LogError(ex, "An unhandled exception occurred.");
                 await HandleExceptionAsync(context, ex);
             }
         }
