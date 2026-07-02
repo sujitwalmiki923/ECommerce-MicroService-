@@ -1,4 +1,5 @@
 ﻿using IdentityService.DTOs;
+using IdentityService.Exceptions;
 using IdentityService.Interfaces;
 using IdentityService.Models;
 using Microsoft.AspNetCore.Identity;
@@ -24,7 +25,7 @@ namespace IdentityService.Services
 
             if(user == null) 
             {
-                throw new Exception("Invalid Email or Password");
+                throw new UnauthorizedException("Invalid Email or Password");
             }
 
             //Step 2: Verify Password
@@ -32,7 +33,7 @@ namespace IdentityService.Services
 
             if (!isPasswordValid) 
             {
-                throw new Exception("Invalid email or password");
+                throw new UnauthorizedException("Invalid email or password");
             }
 
             //Step 3: Generate JWT Token
@@ -53,8 +54,10 @@ namespace IdentityService.Services
 
             if(existingUser != null)
             {
-                throw new Exception("Email already exists");
+               // throw new Exception("Email already exists");
+               throw new ConflictException("Email already exists");
             }
+        
 
             var user = new User
             {
