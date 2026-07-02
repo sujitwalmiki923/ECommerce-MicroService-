@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using IdentityService.Middleware;
 
 namespace IdentityService
 {
@@ -126,6 +127,8 @@ namespace IdentityService
                 app.UseSwaggerUI();
             }
           
+            app.UseMiddleware<GlobalExceptionMiddleware>();
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
