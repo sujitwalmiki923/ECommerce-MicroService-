@@ -1,4 +1,5 @@
-﻿using IdentityService.Exceptions;
+﻿using IdentityService.Common;
+using IdentityService.Exceptions;
 using System.Text.Json;
 
 namespace IdentityService.Middleware
@@ -38,11 +39,14 @@ namespace IdentityService.Middleware
 
             context.Response.StatusCode = statusCode;
 
-            var response = new
-            {
-                StatusCode = statusCode,
-                Message = exception.Message
-            };
+            //var response = new
+            //{
+            //    StatusCode = statusCode,
+            //    Message = exception.Message
+            //};
+            var response = ApiResponse<object>.FailureResponse(
+                   exception.Message
+               );
 
             var json = JsonSerializer.Serialize(response);
             
