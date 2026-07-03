@@ -12,12 +12,14 @@ namespace IdentityService.Services
         private readonly IPasswordService _passwordService;
         private readonly IJwtService _jwtService;
         private readonly ILogger<AuthService> _logger;
-        public AuthService(IUserRepository userRepository , IPasswordService passwordService , IJwtService jwtService ,ILogger<AuthService> logger )
+        private readonly IRefreshTokenService _refreshTokenService;
+        public AuthService(IUserRepository userRepository , IPasswordService passwordService , IJwtService jwtService ,ILogger<AuthService> logger , IRefreshTokenService refreshTokenService )
         {
              _userRepository = userRepository; 
             _passwordService = passwordService;
             _jwtService = jwtService;
             _logger = logger;
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -44,12 +46,15 @@ namespace IdentityService.Services
             }
 
             //Step 3: Generate JWT Token
-            var token = _jwtService.GenerateToken(user);
+            var accesstoken = _jwtService.GenerateToken(user);
+
+            var refreshToken = await _refreshTokenService.CreateRefreshTokenAsync(user);
 
             _logger.LogInformation( "User {UserId} logged in successfully.", user.Id);
             return new LoginResponse 
             {
-                Token = token,
+                AccessToken = accesstoken,
+                RefreshToken = refreshToken.Token,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(60)
             };
 
