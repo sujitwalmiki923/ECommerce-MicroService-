@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using IdentityService.Common;
 
 namespace IdentityService
 {
@@ -25,11 +27,28 @@ namespace IdentityService
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection"));
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+
+                    // Retry Mechanism For Temporary Failures
+                      sqloptions =>
+                      {
+                          sqloptions.EnableRetryOnFailure(
+                              maxRetryCount: 5,
+                              maxRetryDelay : TimeSpan.FromSeconds(30),
+                              errorNumbersToAdd : null
+                              );
+                      }
+                    );
             });
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+
+            //For Creating Refresh Token CRUD
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
+            //For Generating Refresh Token using RandomGenerator and Cryptography
+            builder.Services.AddScoped<IRefreshTokenService,RefreshTokenService>();
 
             //Password-Hashing Service
             builder.Services.AddSingleton<IPasswordService,PasswordService>();
@@ -75,6 +94,28 @@ namespace IdentityService
             });
 
             builder.Services.AddControllers();
+
+            //Fluent Validation
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    //Collect all The Error From Fluent Validation Model.IsInvalid
+                    var errors = context.ModelState
+                    .Values
+                    .SelectMany(x => x.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                    //Generate Generic Response
+                    var response = ApiResponse<object>.FailureResponse(
+                        "Validation Failed",
+                        errors
+                        );
+
+                    return new BadRequestObjectResult(response);
+                };
+            });
 
             builder.Services.AddFluentValidationAutoValidation();
 
