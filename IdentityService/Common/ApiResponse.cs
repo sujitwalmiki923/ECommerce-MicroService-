@@ -10,7 +10,9 @@
 
         public List<string> Errors { get; set; } = new();
 
-        public static ApiResponse<T> SuccessResponse(T data, string message)
+        public static ApiResponse<T> SuccessResponse(
+            T data,
+            string message)
         {
             return new ApiResponse<T>
             {
@@ -21,6 +23,7 @@
         }
 
         public static ApiResponse<T> FailureResponse(
+            T? data,
             string message,
             List<string>? errors = null)
         {
@@ -28,6 +31,7 @@
             {
                 Success = false,
                 Message = message,
+                Data = data,
                 Errors = errors ?? new List<string>()
             };
         }

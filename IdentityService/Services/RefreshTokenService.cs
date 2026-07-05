@@ -35,5 +35,21 @@ namespace IdentityService.Services
             return Convert.ToBase64String(randomBytes);
             // throw new NotImplementedException();
         }
+
+        public async Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken)
+        {
+            return await _repository.GetByTokenAsync(refreshToken);
+            //throw new NotImplementedException();
+        }
+
+        public async Task RevokeAsync(RefreshToken refreshToken)
+        {
+            refreshToken.IsRevoked = true;
+
+            refreshToken.RevokedAt = DateTime.UtcNow;
+
+            await _repository.UpdateAsync(refreshToken);
+           // throw new NotImplementedException();
+        }
     }
 }

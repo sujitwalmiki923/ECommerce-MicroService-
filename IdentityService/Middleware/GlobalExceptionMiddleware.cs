@@ -1,62 +1,63 @@
 ﻿using IdentityService.Common;
 using IdentityService.Exceptions;
-using System.Text.Json;
 
-namespace IdentityService.Middleware
+namespace IdentityService.Middleware;
+
+public class GlobalExceptionMiddleware
 {
-    public class GlobalExceptionMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<GlobalExceptionMiddleware> _logger;
+
+    public GlobalExceptionMiddleware(
+        RequestDelegate next,
+        ILogger<GlobalExceptionMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        ILogger<GlobalExceptionMiddleware> _logger;
-        public GlobalExceptionMiddleware(RequestDelegate request , ILogger<GlobalExceptionMiddleware> logger)
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = request; 
-            _logger = logger;
+            await _next(context);
         }
-
-        public async Task InvokeAsync(HttpContext context)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(context);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "An unhandled exception occurred.");
-                await HandleExceptionAsync(context, ex);
-            }
+            await HandleExceptionAsync(context, ex);
+        }
+    }
+
+    private async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+
+        int statusCode;
+        string message;
+
+        if (exception is AppException appException)
+        {
+            statusCode = appException.StatusCode;
+            message = appException.Message;
+        }
+        else
+        {
+            statusCode = StatusCodes.Status500InternalServerError;
+            message = "An unexpected error occurred.";
+
+            _logger.LogError(exception,
+                "Unhandled exception occurred.");
         }
 
-        private static async Task HandleExceptionAsync(HttpContext context , Exception exception) 
-        { 
-            context.Response.ContentType = "application/json";
+        context.Response.StatusCode = statusCode;
 
-            int statusCode = exception switch
-            {
-                ConflictException => StatusCodes.Status409Conflict,
-                UnauthorizedException => StatusCodes.Status401Unauthorized,
-                NotFoundException => StatusCodes.Status404NotFound,
+        var response = ApiResponse<object>.FailureResponse(
+            null,
+            message
+        );
 
-                _ => StatusCodes.Status500InternalServerError
-            };
-
-            context.Response.StatusCode = statusCode;
-
-            //var response = new
-            //{
-            //    StatusCode = statusCode,
-            //    Message = exception.Message
-            //};
-            var response = ApiResponse<object>.FailureResponse(
-                   exception.Message
-               );
-
-            var json = JsonSerializer.Serialize(response);
-            
-            await context.Response.WriteAsync(json);
-
-
-         }
-        }
+        await context.Response.WriteAsJsonAsync(response);
+    }
 }
-

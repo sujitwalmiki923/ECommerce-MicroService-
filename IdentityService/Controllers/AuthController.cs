@@ -48,5 +48,19 @@ namespace IdentityService.Controllers
                     "Login Successful"
                     ));
         }
+
+        //RefreshToken
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh(RefreshTokenRequest request)
+        {
+            var response = 
+                await _authService.RefreshTokenAsync(request);
+
+            return Ok(
+                ApiResponse<RefreshTokenResponse>.SuccessResponse(
+                    response,
+                    "Token Refreshed Successfully"));
+
+        }
     }
 }
