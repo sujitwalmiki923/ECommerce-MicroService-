@@ -3,6 +3,7 @@
   <Folder Name="/shared/" />
   <Folder Name="/src/">
     <Project Path="IdentityService/IdentityService.csproj" />
+    <Project Path="src/ProductService/ProductService.csproj" />
   </Folder>
   <Folder Name="/tests/" />
 </Solution>
