@@ -38,5 +38,38 @@ namespace ProductService.Services
             };
         }
 
+        public async Task<IEnumerable<ProductResponse>> GetAllAsync()
+        {
+            var products = await _repository.GetAllAsync();
+
+            return products.Select(p => new ProductResponse
+            {
+                Id = p.Id,
+                Name= p.Name,
+                Description = p.Description,
+                Price= p.Price,
+                Stock =p.Stock
+            });
+           // throw new NotImplementedException();
+        }
+
+        public async Task<ProductResponse> GetByIdAsync(int id)
+        {
+            var product = await
+                            _repository.GetByIdAsync(id);
+
+            if (product == null)
+                throw new Exception("Product not Found");
+
+            return new ProductResponse
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Stock = product.Stock
+            };
+            //throw new NotImplementedException();
+        }
     }
 }

@@ -44,5 +44,20 @@ namespace ProductService.Controllers
            // var product = await _service.CreateAsync(request);
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var products = await
+                _service.GetAllAsync();
+
+            return Ok(products);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetByID(int id)
+        {
+            return Ok(await _service.GetByIdAsync(id));
+        }
     }
 }
