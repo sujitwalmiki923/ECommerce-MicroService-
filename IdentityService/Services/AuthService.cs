@@ -42,7 +42,7 @@ namespace IdentityService.Services
             {
                 _logger.LogWarning( "Invalid password for {Email}",request.Email);
                 throw new InvalidCredentialsException();
-                // throw new UnauthorizedException("Invalid email or password.");
+                // throw new UnauthorizedException("Inv alid email or password.");
                 // throw new UnauthorizedException("Invalid email or password");
             }
 
