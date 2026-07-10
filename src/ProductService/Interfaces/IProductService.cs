@@ -10,5 +10,9 @@ namespace ProductService.Interfaces
         Task<IEnumerable<ProductResponse>> GetAllAsync();
 
         Task<ProductResponse> GetByIdAsync(int id);
+
+        Task UpdateAsync(int id, UpdateProductRequest request);
+
+        Task DeleteAsync(int id);
     }
 }

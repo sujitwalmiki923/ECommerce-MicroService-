@@ -38,6 +38,18 @@ namespace ProductService.Services
             };
         }
 
+        public async Task DeleteAsync(int id)
+        {
+            var product = await
+                            _repository.GetByIdAsync(id);
+
+            if (product == null)
+                throw new Exception("Product Not Found");
+
+            await _repository.DeleteAsync(product);
+            //throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<ProductResponse>> GetAllAsync()
         {
             var products = await _repository.GetAllAsync();
@@ -69,6 +81,23 @@ namespace ProductService.Services
                 Price = product.Price,
                 Stock = product.Stock
             };
+            //throw new NotImplementedException();
+        }
+
+        public async Task UpdateAsync(int id, UpdateProductRequest request)
+        {
+            var product = await
+                            _repository.GetByIdAsync(id);
+
+            if (product == null)
+                throw new Exception("Product not Found");
+
+            product.Name = request.Name;
+            product.Description = request.Description;
+            product.Price = request.Price;
+            product.Stock = request.Stock;
+
+            await _repository.UpdateAsync(product);
             //throw new NotImplementedException();
         }
     }

@@ -59,5 +59,23 @@ namespace ProductService.Controllers
         {
             return Ok(await _service.GetByIdAsync(id));
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(
+            int id,
+            UpdateProductRequest request
+            )
+        {
+            await _service.UpdateAsync(id, request);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _service.DeleteAsync(id);
+
+            return NoContent();
+        }
     }
 }
