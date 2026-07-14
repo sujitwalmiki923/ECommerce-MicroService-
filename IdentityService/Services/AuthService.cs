@@ -125,7 +125,9 @@ namespace IdentityService.Services
 
                 //Temporary 
                
-                Role = "User"
+                Role =  string.IsNullOrWhiteSpace( request.Role )              ///"User"
+                        ? "User"
+                        : request.Role
 
             };
 

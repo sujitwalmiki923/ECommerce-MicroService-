@@ -15,5 +15,7 @@ namespace IdentityService.DTOs
 
         
         public string Password { get; set; } = string.Empty;
+
+        public string Role { get; set; } = "User";  //Setting User as Default Role
     }
 }

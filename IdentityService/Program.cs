@@ -92,6 +92,7 @@ namespace IdentityService
                     };
 
             });
+            builder.Services.AddAuthorization();
 
             builder.Services.AddControllers();
 

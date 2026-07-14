@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductService.DTOs;
 using ProductService.Interfaces;
 using ProductService.Models;
@@ -17,6 +18,7 @@ namespace ProductService.Controllers
             _service = service;       
         }
 
+        [Authorize(Roles ="Admin")] //Role Based Authorization
         //ADD Product
         [HttpPost("add")]
         public async Task<IActionResult> Create(CreateProductRequest request)
